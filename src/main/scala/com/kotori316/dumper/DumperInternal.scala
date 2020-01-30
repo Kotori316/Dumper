@@ -10,7 +10,7 @@ import net.minecraftforge.fml.event.server.FMLServerStartedEvent
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{Await, Future, TimeoutException}
 import scala.util.Failure
 
 object DumperInternal {
@@ -38,10 +38,14 @@ object DumperInternal {
       }
       future
     }
-    Await.ready(futures, Duration(1, "min"))
-    futures.onComplete { _ =>
-      val l2 = System.nanoTime()
-      Dumper.LOGGER.info(f"Dumper finished in ${(l2 - l) / 1e9}%.3f s")
+    try {
+      Await.ready(futures, Duration(5, "min"))
+      futures.onComplete { _ =>
+        val l2 = System.nanoTime()
+        Dumper.LOGGER.info(f"Dumper finished in ${(l2 - l) / 1e9}%.3f s")
+      }
+    } catch {
+      case e: TimeoutException => Dumper.LOGGER.error("Timeout to dump info.", e)
     }
   }
 

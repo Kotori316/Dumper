@@ -32,9 +32,9 @@ object TENames extends Dumps[TileEntity] {
     val b = REGISTRY.flatMap {
       case (name, clazz, t: Try[TileEntity]) =>
 
-        val capName = t.map { tile =>
+        val capName = allCatch.withTry(t.map { tile =>
           CAPABILITY.filter(c => tile.getCapability(c, Direction.UP).isPresent).map(simpleName).mkString(" : ")
-        } match {
+        }).flatten match {
           case Success(s) => "         " + s
           case Failure(exception) => exception.toString
         }
