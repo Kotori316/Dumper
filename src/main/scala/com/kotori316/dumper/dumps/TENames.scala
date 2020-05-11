@@ -1,5 +1,6 @@
 package com.kotori316.dumper.dumps
 
+import java.lang.reflect.Field
 import java.util
 
 import net.minecraft.tileentity.{TileEntity, TileEntityType}
@@ -15,7 +16,7 @@ object TENames extends Dumps[TileEntity] {
   override val configName: String = "OutputTileentity"
   override val fileName: String = "tileentity"
 
-  val field_Capacity = classOf[CapabilityManager].getDeclaredField("providers")
+  val field_Capacity: Field = classOf[CapabilityManager].getDeclaredField("providers")
   field_Capacity.setAccessible(true)
 
   override def content(filters: Seq[Filter[TileEntity]]): Seq[String] = {

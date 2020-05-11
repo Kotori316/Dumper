@@ -7,6 +7,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.tags.ItemTags
 import net.minecraft.util.ResourceLocation
 
+import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
 trait Dumps[T] {
@@ -14,8 +15,8 @@ trait Dumps[T] {
   val configName: String
   val fileName: String
 
-  val factoryClass = Class.forName("net.minecraftforge.registries.NamespacedWrapper$Factory")
-  val WRAPPER_ID = factoryClass.getDeclaredField("ID").get(null).asInstanceOf[ResourceLocation]
+  val factoryClass: Class[_] = Class.forName("net.minecraftforge.registries.NamespacedWrapper$Factory")
+  val WRAPPER_ID: ResourceLocation = factoryClass.getDeclaredField("ID").get(null).asInstanceOf[ResourceLocation]
 
   def path: Path = Paths.get(Dumper.modID, fileName + ".txt")
 
@@ -56,7 +57,7 @@ trait Dumps[T] {
     }
   }
 
-  def oreNameSeq(stack: ItemStack) = {
+  def oreNameSeq(stack: ItemStack): mutable.Iterable[ResourceLocation] = {
     ItemTags.getCollection.getTagMap.asScala.collect { case (name, tag) if tag.contains(stack.getItem) => name }
   }
 }
