@@ -32,10 +32,6 @@ object BlocksDump extends Dumps[Block] {
     formatter.format(blockList.toSeq)
   }
 
-  def oreNameSeq(block: Block): Iterable[ResourceLocation] = {
-    block.getTags.asScala
-  }
-
   private case class Data(block: Block, stack: ItemStack) {
     def name: String = if (stack.isEmpty) {
       block.getName.getString
@@ -50,7 +46,7 @@ object BlocksDump extends Dumps[Block] {
       case c => c.getName.replace("net.minecraft.world.item.", "")
     }
 
-    def tags: String = block.getTags.asScala.toSeq.sortBy(_.toString).mkString(", ")
+    def tags: String = tagNameSeq(block).sortBy(_.toString).mkString(", ")
 
     def properties: String = block.getStateDefinition.getProperties.asScala.map(_.getName).mkString(", ")
 

@@ -1,11 +1,13 @@
 package com.kotori316.dumper.dumps.items
 
 import com.kotori316.dumper.dumps.{Dumps, Filter, Formatter}
+import net.minecraft.core.Registry
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.MinecraftServer
 import net.minecraft.tags.{BlockTags, Tag}
 import net.minecraft.world.level.block.Block
 
+import scala.annotation.nowarn
 import scala.jdk.CollectionConverters._
 
 object MineableDump extends Dumps[Tag[_]] {
@@ -22,11 +24,12 @@ object MineableDump extends Dumps[Tag[_]] {
     Seq(_.registryName)
   )
 
+  @nowarn //noinspection ScalaDeprecation
   override def content(filters: Seq[Filter[Tag[_]]], server: MinecraftServer): Seq[String] = {
     for {
       tag <- tags
-      entries = tag.getValues.asScala.map(Entry)
-      string <- s"# ${tag.getName}" +: formatter.format(entries) :+ System.lineSeparator()
+      entries = Registry.BLOCK.getTagOrEmpty(tag).asScala.map(_.value).map(Entry).toSeq
+      string <- s"# ${tag.location}" +: formatter.format(entries) :+ System.lineSeparator()
     } yield string
   }
 

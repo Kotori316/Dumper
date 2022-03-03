@@ -28,7 +28,8 @@ archivesBaseName = "Dumper"
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 minecraft {
-    mappings channel: 'parchment', version: project.parchmentMapping
+    // mappings channel: 'parchment', version: project.parchmentMapping
+    mappings channel: 'official', version: project.minecraftVersion
     runs {
         client {
             workingDirectory project.file('Minecraft')
@@ -159,7 +160,7 @@ task signJar2() {
 
 if (!Boolean.valueOf(System.getenv("GITHUB_ACTIONS"))) {
     // Runs this task automatically when build is ran.
-    assemble.dependsOn(signJar2)
+    assemble.finalizedBy(signJar2)
 }
 
 def getChangeLog() {
