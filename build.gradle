@@ -28,8 +28,8 @@ archivesBaseName = "Dumper"
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 minecraft {
-    // mappings channel: 'parchment', version: project.parchmentMapping
-    mappings channel: 'official', version: project.minecraftVersion
+    mappings channel: 'parchment', version: ((project.parchmentMapping + "-" + project.minecraftVersion) as String)
+    // mappings channel: 'official', version: project.minecraftVersion
     runs {
         client {
             workingDirectory project.file('Minecraft')
