@@ -4,7 +4,7 @@ buildscript {
         maven { url = "https://maven.minecraftforge.net/" }
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
     }
 }
 plugins {
@@ -62,7 +62,7 @@ minecraft {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.5-36.2.8'
+    minecraft 'net.minecraftforge:forge:1.16.5-36.2.34'
     implementation "org.scala-lang:scala-library:2.13.5"
     implementation group: 'org.typelevel', name: "cats-core_2.13", version: '2.6.0'
 }
