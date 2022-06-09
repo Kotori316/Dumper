@@ -2,7 +2,7 @@ package com.kotori316.dumper.dumps
 
 import net.minecraft.ChatFormatting
 import net.minecraft.core.Registry
-import net.minecraft.network.chat.TranslatableComponent
+import net.minecraft.network.chat.Component
 import net.minecraft.resources.{ResourceKey, ResourceLocation}
 import net.minecraft.world.item.enchantment.Enchantment
 import net.minecraftforge.registries.ForgeRegistries
@@ -32,12 +32,12 @@ object EnchantmentNames extends FastDumps[Enchantment] {
   case class EData(name: ResourceLocation, e: Enchantment, id: Int) extends Ordered[EData] {
     override def compare(that: EData): Int = this.id compare that.id
 
-    def translatedName: String = ChatFormatting.stripFormatting(new TranslatableComponent(e.getDescriptionId).getString)
+    def translatedName: String = ChatFormatting.stripFormatting(Component.translatable(e.getDescriptionId).getString)
   }
 
   object EData {
     def apply(e: java.util.Map.Entry[ResourceKey[Enchantment], Enchantment])(implicit r: Registry[Enchantment]): EData = {
-      new EData(e.getKey.getRegistryName, e.getValue, r.getId(e.getValue))
+      new EData(e.getKey.location(), e.getValue, r.getId(e.getValue))
     }
   }
 

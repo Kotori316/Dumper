@@ -8,6 +8,7 @@ import com.kotori316.dumper.dumps.Filter
 import net.minecraft.tags.{BlockTags, ItemTags}
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.Block
+import net.minecraftforge.registries.ForgeRegistries
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
@@ -24,7 +25,7 @@ trait SFilter extends Filter[Block] {
   override final def addToList(v: Block): Boolean = {
     if (accept(v)) {
       short += v.getName.getString + BlocksDump.tagName(v)
-      unique += v.getRegistryName.toString
+      unique += ForgeRegistries.BLOCKS.getKey(v).toString
       true
     } else false
   }

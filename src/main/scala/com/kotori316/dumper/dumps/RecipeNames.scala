@@ -5,6 +5,7 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.MinecraftServer
 import net.minecraft.world.item.crafting.Recipe
 
+import scala.annotation.nowarn
 import scala.jdk.javaapi.CollectionConverters
 
 object RecipeNames extends Dumps[Recipe[_]] {
@@ -25,6 +26,7 @@ object RecipeNames extends Dumps[Recipe[_]] {
   }
 
   private case class RecipeData(private val recipe: Recipe[_]) {
+    @nowarn //noinspection ScalaDeprecation
     val recipeType: String = Registry.RECIPE_TYPE.getKey(recipe.getType).toString
 
     def getId: ResourceLocation = recipe.getId

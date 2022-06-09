@@ -9,6 +9,7 @@ import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.item._
 import net.minecraft.world.level.block.Blocks
+import net.minecraftforge.registries.ForgeRegistries
 
 import scala.jdk.CollectionConverters._
 
@@ -26,7 +27,7 @@ class PickaxeFilter extends Filter[ItemData] {
       PICKAXE_PATTERN2.matcher(uniqueName).find
 
   override def addToList(v: ItemData): Boolean = {
-    val uniqueName = v.item.getRegistryName.toString
+    val uniqueName = ForgeRegistries.ITEMS.getKey(v.item).toString
     if (accept(v.item, v.displayName, uniqueName)) {
       pickaxeBuilder += (v.displayName + " : " + v.stack.getMaxDamage + " : " + v.stack.getDestroySpeed(Blocks.STONE.defaultBlockState()))
       pickaxeShortBuilder += uniqueName
@@ -60,7 +61,7 @@ class SwordFilter extends Filter[ItemData] {
       SWORD_PATTERN2.matcher(uniqueName).find
 
   override def addToList(v: ItemData): Boolean = {
-    val uniqueName = v.item.getRegistryName.toString
+    val uniqueName = ForgeRegistries.ITEMS.getKey(v.item).toString
     if (accept(v.item, v.displayName, uniqueName)) {
       val valueMap = v.item.getAttributeModifiers(EquipmentSlot.MAINHAND, v.stack)
       val damage = valueMap.get(Attributes.ATTACK_DAMAGE).asScala.map(_.getAmount)
@@ -97,7 +98,7 @@ class ShovelFilter extends Filter[ItemData] {
       SHOVEL_PATTERN2.matcher(uniqueName).find
 
   override def addToList(v: ItemData): Boolean = {
-    val uniqueName = v.item.getRegistryName.toString
+    val uniqueName = ForgeRegistries.ITEMS.getKey(v.item).toString
     if (accept(v.item, v.displayName, uniqueName)) {
       SHOVELBuilder += (v.displayName + " : " + v.stack.getMaxDamage + " : " + v.stack.getDestroySpeed(Blocks.GRASS_BLOCK.defaultBlockState()))
       SHOVELShortBuilder += uniqueName
@@ -131,7 +132,7 @@ class AxeFilter extends Filter[ItemData] {
       AXE_PATTERN2.matcher(uniqueName).find
 
   override def addToList(v: ItemData): Boolean = {
-    val uniqueName = v.item.getRegistryName.toString
+    val uniqueName = ForgeRegistries.ITEMS.getKey(v.item).toString
     if (accept(v.item, v.displayName, uniqueName)) {
       axeBuilder += (v.displayName + " : " + v.stack.getMaxDamage + " : " + v.stack.getDestroySpeed(Blocks.OAK_LOG.defaultBlockState()))
       axeShortBuilder += uniqueName

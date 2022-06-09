@@ -15,7 +15,7 @@ object ItemsDump extends Dumps[ItemData] {
   override val fileName = "items"
   final val formatter = new Formatter[ItemData](
     Seq("Index", "ID", "-Name", "-RegistryName", "-Tags"),
-    Seq(_.index, _.id, _.displayName, _.item.getRegistryName, _.tags)
+    Seq(_.index, _.id, _.displayName, d => ForgeRegistries.ITEMS.getKey(d.item), _.tags)
   )
 
   override def getFilters: Seq[Filter[ItemData]] = Seq(new PickaxeFilter, new AxeFilter, new ShovelFilter, new SwordFilter)

@@ -39,7 +39,7 @@ object BlocksDump extends Dumps[Block] {
       stack.getHoverName.getString
     }
 
-    def registryName: ResourceLocation = block.getRegistryName
+    def registryName: ResourceLocation = ForgeRegistries.BLOCKS.getKey(block)
 
     def itemClass: String = stack.getItem.getClass match {
       case c if c == classOf[BlockItem] => ""

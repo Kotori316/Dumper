@@ -4,13 +4,14 @@ import com.kotori316.dumper.dumps.{Dumps, Filter, Formatter}
 import net.minecraft.core.Registry
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.MinecraftServer
-import net.minecraft.tags.{BlockTags, Tag}
+import net.minecraft.tags.{BlockTags, TagKey}
 import net.minecraft.world.level.block.Block
+import net.minecraftforge.registries.ForgeRegistries
 
 import scala.annotation.nowarn
 import scala.jdk.CollectionConverters._
 
-object MineableDump extends Dumps[Tag[_]] {
+object MineableDump extends Dumps[TagKey[_]] {
   override val configName: String = "OutputMineable"
   override val fileName: String = "mineable"
   private final val tags = Seq(
@@ -25,7 +26,7 @@ object MineableDump extends Dumps[Tag[_]] {
   )
 
   @nowarn //noinspection ScalaDeprecation
-  override def content(filters: Seq[Filter[Tag[_]]], server: MinecraftServer): Seq[String] = {
+  override def content(filters: Seq[Filter[TagKey[_]]], server: MinecraftServer): Seq[String] = {
     for {
       tag <- tags
       entries = Registry.BLOCK.getTagOrEmpty(tag).asScala.map(_.value).map(Entry).toSeq
@@ -34,6 +35,6 @@ object MineableDump extends Dumps[Tag[_]] {
   }
 
   case class Entry(block: Block) {
-    def registryName: ResourceLocation = block.getRegistryName
+    def registryName: ResourceLocation = ForgeRegistries.BLOCKS.getKey(block)
   }
 }

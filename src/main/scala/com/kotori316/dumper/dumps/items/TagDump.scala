@@ -5,14 +5,13 @@ import net.minecraft.core.Registry
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.MinecraftServer
 import net.minecraft.tags._
-import net.minecraftforge.registries.IForgeRegistryEntry
 
 import scala.jdk.StreamConverters._
 
-object TagDump extends Dumps[Tag[_]] {
+object TagDump extends Dumps[TagKey[_]] {
   override val configName = "OutputTagNames"
   override val fileName = "tags"
-  final val formatter = new Formatter[TagData](
+  final val formatter = new Formatter[TagData[_]](
     Seq("-name", "count", "-content"),
     Seq(_.name, _.content.size, _.contentRegistryNames().mkString(", "))
   )
@@ -24,20 +23,20 @@ object TagDump extends Dumps[Tag[_]] {
     BlockTags.WALL_POST_OVERRIDE,
   ).map(_.location)
 
-  override def content(filters: Seq[Filter[Tag[_]]], server: MinecraftServer): Seq[String] = {
+  override def content(filters: Seq[Filter[TagKey[_]]], server: MinecraftServer): Seq[String] = {
     import scala.jdk.CollectionConverters._
     Registry.REGISTRY.asScala.map(r => r.key() -> r).toSeq.sortBy(_._1.location).flatMap { case (name, c) =>
-      tagToMessage(c, name.location.toString)
+      tagToMessage(c.asInstanceOf[Registry[AnyRef]], name.location.toString)
     }
   }
 
-  def tagToMessage(collection: Registry[_], name: String): Seq[String] = {
-    val map: Map[ResourceLocation, Seq[_]] = collection.getTags.toScala(Seq)
+  def tagToMessage[T](collection: Registry[T], name: String): Seq[String] = {
+    val map: Map[ResourceLocation, Seq[T]] = collection.getTags.toScala(Seq)
       .filterNot(p => ignoreTags(p.getFirst.location))
       .map(p =>
         p.getFirst.location -> p.getSecond.stream().map(_.value()).toScala(Seq)
       ).toMap
-    val tagSeq: Seq[TagData] = map.map { case (location, values) => TagData(location.toString, values) }.toSeq
+    val tagSeq: Seq[TagData[T]] = map.map { case (location, values) => TagData(location.toString, values, v => collection.getKey(v)) }.toSeq
       .sortBy(_.name)
     if (tagSeq.isEmpty) {
       Seq.empty
@@ -46,12 +45,9 @@ object TagDump extends Dumps[Tag[_]] {
     }
   }
 
-  case class TagData(name: String, content: Seq[_]) {
+  case class TagData[T](name: String, content: Seq[T], nameGetter: T => ResourceLocation) {
     def contentRegistryNames(): Seq[String] =
-      content.collect {
-        case e: IForgeRegistryEntry[_] => e.getRegistryName.toString
-        case o => o.toString
-      }
+      content.map(nameGetter).map(_.toString)
   }
 
 }

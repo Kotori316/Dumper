@@ -1,6 +1,6 @@
 package com.kotori316.dumper.dumps
 
-import net.minecraft.network.chat.TranslatableComponent
+import net.minecraft.network.chat.Component
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.material.Fluid
 import net.minecraftforge.registries.ForgeRegistries
@@ -20,7 +20,7 @@ object FluidNames extends FastDumps[Fluid] {
   private[this] final val color = "Color"
   private[this] final val hasBlock = "hasBlock"
   final val formatter = new Formatter[Fluid](Seq("-RegistryName", "-Name", luminosity, density, temperature, viscosity, gaseous, rarity, color, hasBlock),
-    Seq(_.getRegistryName, f => new TranslatableComponent(f.getAttributes.getTranslationKey).getString, _.getAttributes.getLuminosity, _.getAttributes.getDensity,
+    Seq(f => ForgeRegistries.FLUIDS.getKey(f), f => Component.translatable(f.getAttributes.getTranslationKey).getString, _.getAttributes.getLuminosity, _.getAttributes.getDensity,
       _.getAttributes.getTemperature.toString + " [K]", _.getAttributes.getViscosity, _.getAttributes.isGaseous, _.getAttributes.getRarity.toString,
       _.getAttributes.getColor.toHexString, _.defaultFluidState().createLegacyBlock() != Blocks.AIR.defaultBlockState))
 
