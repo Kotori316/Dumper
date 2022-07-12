@@ -2,13 +2,11 @@ package com.kotori316.dumper.dumps
 
 import java.util
 
-import cpw.mods.modlauncher.Launcher
 import net.minecraft.core.{BlockPos, Direction}
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityType}
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraftforge.common.capabilities.{Capability, CapabilityManager}
-import net.minecraftforge.fml.util.ObfuscationReflectionHelper
 import net.minecraftforge.registries.ForgeRegistries
 
 import scala.jdk.CollectionConverters._
@@ -32,7 +30,7 @@ object TENames extends FastDumps[BlockEntity] {
   }
 
   override def content(filters: Seq[Filter[BlockEntity]]): Seq[String] = {
-    val value = ForgeRegistries.BLOCK_ENTITIES
+    val value = ForgeRegistries.BLOCK_ENTITY_TYPES
     val REGISTRY = value.getKeys.asScala.clone().map(name => {
       val tileType: BlockEntityType[_ <: BlockEntity] = value.getValue(name).asInstanceOf[BlockEntityType[_ <: BlockEntity]]
       val instance: Try[BlockEntity] = allCatch withTry tileType.create(BlockPos.ZERO, getStateForBlockEntity(tileType))

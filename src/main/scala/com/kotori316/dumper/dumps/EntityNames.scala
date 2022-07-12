@@ -8,7 +8,7 @@ import scala.jdk.CollectionConverters._
 
 object EntityNames extends FastDumps[EntityType[_]] {
   override def content(filters: Seq[Filter[EntityType[_]]]): Seq[String] = {
-    val value = ForgeRegistries.ENTITIES.getEntries.asScala.toSeq.map(e => EntityData(e.getKey.location, e.getValue))
+    val value = ForgeRegistries.ENTITY_TYPES.getEntries.asScala.toSeq.map(e => EntityData(e.getKey.location, e.getValue))
       .sorted
     formatter.format(value)
   }

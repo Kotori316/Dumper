@@ -3,7 +3,7 @@ package com.kotori316.dumper.dumps
 import net.minecraft.network.chat.Component
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.material.{Fluid, Fluids}
-import net.minecraftforge.client.RenderProperties
+import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions
 import net.minecraftforge.registries.ForgeRegistries
 
 import scala.jdk.CollectionConverters._
@@ -23,7 +23,7 @@ object FluidNames extends FastDumps[Fluid] {
   final val formatter = new Formatter[Fluid](Seq("-RegistryName", "-Name", luminosity, density, temperature, viscosity, gaseous, rarity, color, hasBlock),
     Seq(f => ForgeRegistries.FLUIDS.getKey(f), f => Component.translatable(f.getFluidType.getDescriptionId).getString, _.getFluidType.getLightLevel, _.getFluidType.getDensity,
       _.getFluidType.getTemperature.toString + " [K]", _.getFluidType.getViscosity, f => f.getFluidType.getDensity < Fluids.WATER.getFluidType.getDensity, _.getFluidType.getRarity.toString,
-      f => RenderProperties.get(f).getColorTint.toHexString, _.defaultFluidState().createLegacyBlock() != Blocks.AIR.defaultBlockState))
+      f => IClientFluidTypeExtensions.of(f).getTintColor.toHexString, _.defaultFluidState().createLegacyBlock() != Blocks.AIR.defaultBlockState))
 
   override def content(filters: Seq[Filter[Fluid]]): Seq[String] = {
     val fluids = ForgeRegistries.FLUIDS.asScala
