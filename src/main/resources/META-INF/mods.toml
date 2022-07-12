@@ -1,6 +1,6 @@
-modLoader="javafml"
-loaderVersion="[37,)"
-issueTrackerURL="https://github.com/Kotori316/Dumper/issues"
+modLoader = "javafml"
+loaderVersion = "[41,)"
+issueTrackerURL = "https://github.com/Kotori316/Dumper/issues"
 license="All Rights Reserved."
 [[mods]]
 modId="kotori_dumper"
@@ -13,13 +13,13 @@ description='''
 Output much info.'''
 [[dependencies.fluidtank]]
     modId="forge"
-    mandatory=true
-    versionRange="[37,)"
-    ordering="NONE"
+mandatory = true
+versionRange = "[41.0.94,)"
+ordering = "NONE"
     side="BOTH"
 [[dependencies.fluidtank]]
     modId="minecraft"
-    mandatory=true
-    versionRange="[1.17.1,)"
-    ordering="NONE"
+mandatory = true
+versionRange = "[1.19,)"
+ordering = "NONE"
     side="BOTH"
