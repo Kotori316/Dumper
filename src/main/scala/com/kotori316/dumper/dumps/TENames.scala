@@ -2,11 +2,13 @@ package com.kotori316.dumper.dumps
 
 import java.util
 
+import cpw.mods.modlauncher.Launcher
 import net.minecraft.core.{BlockPos, Direction}
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityType}
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraftforge.common.capabilities.{Capability, CapabilityManager}
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper
 import net.minecraftforge.registries.ForgeRegistries
 
 import scala.jdk.CollectionConverters._
