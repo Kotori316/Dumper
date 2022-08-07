@@ -28,8 +28,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Precompile
-      run: chmod +x ./gradlew && ./gradlew compileScala --continue --stacktrace
+      run: chmod +x ./gradlew && ./gradlew compileScala --continue
     - name: Build
-      run: chmod +x ./gradlew && ./gradlew build githubRelease --stacktrace --warning-mode all --continue
+      run: chmod +x ./gradlew && ./gradlew build githubRelease --warning-mode all --continue
       env:
         REPO_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
