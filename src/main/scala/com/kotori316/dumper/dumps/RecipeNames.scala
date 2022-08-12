@@ -26,7 +26,7 @@ object RecipeNames extends Dumps[Recipe[_]] {
   }
 
   private case class RecipeData(private val recipe: Recipe[_]) {
-    @nowarn //noinspection ScalaDeprecation
+    @nowarn //noinspection ScalaDeprecation,deprecation
     val recipeType: String = Registry.RECIPE_TYPE.getKey(recipe.getType).toString
 
     def getId: ResourceLocation = recipe.getId

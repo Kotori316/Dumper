@@ -25,7 +25,7 @@ object MineableDump extends Dumps[TagKey[_]] {
     Seq(_.registryName)
   )
 
-  @nowarn //noinspection ScalaDeprecation
+  @nowarn //noinspection ScalaDeprecation,deprecation
   override def content(filters: Seq[Filter[TagKey[_]]], server: MinecraftServer): Seq[String] = {
     for {
       tag <- tags
