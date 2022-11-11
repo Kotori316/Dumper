@@ -4,9 +4,9 @@ import java.util
 
 import cpw.mods.modlauncher.Launcher
 import net.minecraft.core.{BlockPos, Direction}
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityType}
-import net.minecraft.world.level.block.state.BlockState
 import net.minecraftforge.common.capabilities.{Capability, CapabilityManager}
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper
 import net.minecraftforge.registries.ForgeRegistries
@@ -21,7 +21,7 @@ object TENames extends FastDumps[BlockEntity] {
 
   private[this] final val field_Capacity = classOf[CapabilityManager].getDeclaredField("providers")
   field_Capacity.setAccessible(true)
-  private final val fieldValidBlocks = {
+  private[this] final val fieldValidBlocks = {
     if (Launcher.INSTANCE != null) {
       ObfuscationReflectionHelper.findField(classOf[BlockEntityType[_]], "f_58915_")
     } else {
@@ -32,34 +32,12 @@ object TENames extends FastDumps[BlockEntity] {
   }
 
   override def content(filters: Seq[Filter[BlockEntity]]): Seq[String] = {
-    val value = ForgeRegistries.BLOCK_ENTITY_TYPES
-    val REGISTRY = value.getKeys.asScala.clone().map(name => {
-      val tileType: BlockEntityType[_ <: BlockEntity] = value.getValue(name).asInstanceOf[BlockEntityType[_ <: BlockEntity]]
-      val instance: Try[BlockEntity] = allCatch withTry tileType.create(BlockPos.ZERO, getStateForBlockEntity(tileType))
-      val clazz = instance.map(_.getClass).getOrElse(classOf[BlockEntity])
-      (name, clazz, instance)
-    }).toSeq.sortBy(_._1.toString)
-    val CAPABILITY = field_Capacity.get(CapabilityManager.INSTANCE).asInstanceOf[util.IdentityHashMap[String, Capability[_]]].asScala.clone().values
-
-    val a = CAPABILITY.map(a => a.getName).toSeq
-    val b = REGISTRY.flatMap {
-      case (name, clazz, t: Try[BlockEntity]) =>
-
-        val capName = t.map { tile =>
-          CAPABILITY.filter(c => tile.getCapability(c, Direction.UP).isPresent).map(simpleName).mkString(" : ")
-        } match {
-          case Success(s) => "         " + s
-          case Failure(exception) => exception.toString
-        }
-
-        Seq(name.toString + " : " + clazz.getName, capName)
-
-    }
-    "------Capabilities------" +: (a ++ Seq("", "", "------TileEntities------") ++ b)
+    val caps = field_Capacity.get(CapabilityManager.INSTANCE).asInstanceOf[util.Map[_, Capability[_]]].asScala.clone().values.toSeq
+    Seq("------Capabilities------") ++ contentCapability(caps) ++ Seq("", "------BlockEntities------") ++ contentBlockEntity(caps)
   }
 
-  val simpleName: Capability[_] => String = { c =>
-    val s = c.getName
+  private[this] def simpleName(cap: Capability[_]): String = {
+    val s = cap.getName
     val a = s.lastIndexOf('.')
     if (a == -1) {
       s
@@ -68,9 +46,29 @@ object TENames extends FastDumps[BlockEntity] {
     }
   }
 
-  private def getStateForBlockEntity(entityType: BlockEntityType[_]): BlockState = {
-    fieldValidBlocks.get(entityType).asInstanceOf[util.Set[Block]].asScala
-      .head
-      .defaultBlockState()
+  private[this] def contentCapability(caps: Seq[Capability[_]]): Seq[String] = {
+    caps.map(_.getName).sorted
+  }
+
+  private[this] def contentBlockEntity(caps: Seq[Capability[_]]): Seq[String] = {
+    ForgeRegistries.BLOCK_ENTITY_TYPES.getEntries.asScala
+      .toSeq
+      .sortBy(_.getKey)
+      .flatMap(e => contentOneBlockEntity(caps, e.getValue, e.getKey.location()))
+  }
+
+  private[this] def contentOneBlockEntity(caps: Seq[Capability[_]], entityType: BlockEntityType[_], name: ResourceLocation): Seq[String] = {
+    val blocks = fieldValidBlocks.get(entityType).asInstanceOf[util.Set[Block]].asScala
+    val instance: Try[BlockEntity] = allCatch withTry entityType.create(BlockPos.ZERO, blocks.head.defaultBlockState()).asInstanceOf[BlockEntity]
+    val clazz = instance.map(_.getClass).getOrElse(classOf[BlockEntity])
+    val tileCaps = instance.map(t => caps.filter(c => t.getCapability(c, Direction.UP).isPresent))
+
+    val nameRow = "%s : %s".formatted(name, clazz.getName)
+    val statesRow = blocks.map(ForgeRegistries.BLOCKS.getKey).map(_.toString).mkString("\t", ", ", "")
+    val capsRows = tileCaps match {
+      case Failure(exception) => Seq("\t" + exception.toString)
+      case Success(c) => c.map(simpleName).map(s => "\t" + s)
+    }
+    nameRow +: statesRow +: capsRows
   }
 }
