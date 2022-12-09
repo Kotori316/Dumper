@@ -1,7 +1,7 @@
 package com.kotori316.dumper.dumps.items
 
 import com.kotori316.dumper.dumps.{Dumps, Filter, Formatter}
-import net.minecraft.core.Registry
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.MinecraftServer
 import net.minecraft.tags.{BlockTags, TagKey}
@@ -29,7 +29,7 @@ object MineableDump extends Dumps[TagKey[_]] {
   override def content(filters: Seq[Filter[TagKey[_]]], server: MinecraftServer): Seq[String] = {
     for {
       tag <- tags
-      entries = Registry.BLOCK.getTagOrEmpty(tag).asScala.map(_.value).map(Entry).toSeq
+      entries = BuiltInRegistries.BLOCK.getTagOrEmpty(tag).asScala.map(_.value).map(Entry).toSeq
       string <- s"# ${tag.location}" +: formatter.format(entries) :+ System.lineSeparator()
     } yield string
   }

@@ -1,6 +1,6 @@
 package com.kotori316.dumper.dumps
 
-import net.minecraft.core.Registry
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.MinecraftServer
 import net.minecraft.world.item.crafting.Recipe
@@ -27,7 +27,7 @@ object RecipeNames extends Dumps[Recipe[_]] {
 
   private case class RecipeData(private val recipe: Recipe[_]) {
     @nowarn //noinspection ScalaDeprecation,deprecation
-    val recipeType: String = Registry.RECIPE_TYPE.getKey(recipe.getType).toString
+    val recipeType: String = BuiltInRegistries.RECIPE_TYPE.getKey(recipe.getType).toString
 
     def getId: ResourceLocation = recipe.getId
 

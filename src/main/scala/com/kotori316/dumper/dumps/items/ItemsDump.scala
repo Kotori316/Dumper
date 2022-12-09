@@ -1,14 +1,10 @@
 package com.kotori316.dumper.dumps.items
 
-import com.kotori316.dumper.Dumper
 import com.kotori316.dumper.dumps.{Dumps, Filter, Formatter}
-import net.minecraft.core.NonNullList
 import net.minecraft.server.MinecraftServer
-import net.minecraft.world.item.{CreativeModeTab, ItemStack}
 import net.minecraftforge.registries.ForgeRegistries
 
 import scala.jdk.javaapi.CollectionConverters
-import scala.util.Try
 
 object ItemsDump extends Dumps[ItemData] {
   override val configName = "OutputItems"
@@ -24,18 +20,7 @@ object ItemsDump extends Dumps[ItemData] {
     val items = ForgeRegistries.ITEMS
     val stacks = CollectionConverters.asScala(items)
       .flatMap { item =>
-        val nonNullList = NonNullList.create[ItemStack]()
-        Try {
-          if (item.getItemCategory != null) {
-            item.fillItemCategory(item.getItemCategory, nonNullList)
-          } else {
-            CreativeModeTab.TABS.foreach(item.fillItemCategory(_, nonNullList))
-          }
-          if (nonNullList.isEmpty) nonNullList.add(new ItemStack(item))
-        }.recover {
-          case e: Throwable => Dumper.LOGGER.error(e)
-        }
-        CollectionConverters.asScala(nonNullList)
+        Seq(item.getDefaultInstance)
       }
       .zipWithIndex
       .map { case (stack, i) =>

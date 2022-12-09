@@ -2,6 +2,7 @@ package com.kotori316.dumper.dumps.items
 
 import com.kotori316.dumper.dumps.{Dumps, Filter, Formatter}
 import net.minecraft.core.Registry
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.MinecraftServer
 import net.minecraft.tags._
@@ -25,7 +26,7 @@ object TagDump extends Dumps[TagKey[_]] {
 
   override def content(filters: Seq[Filter[TagKey[_]]], server: MinecraftServer): Seq[String] = {
     import scala.jdk.CollectionConverters._
-    Registry.REGISTRY.asScala.map(r => r.key() -> r).toSeq.sortBy(_._1.location).flatMap { case (name, c) =>
+    BuiltInRegistries.REGISTRY.asScala.map(r => r.key() -> r).toSeq.sortBy(_._1.location).flatMap { case (name, c) =>
       tagToMessage(c.asInstanceOf[Registry[AnyRef]], name.location.toString)
     }
   }

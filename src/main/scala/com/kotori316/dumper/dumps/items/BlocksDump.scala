@@ -1,7 +1,7 @@
 package com.kotori316.dumper.dumps.items
 
 import com.kotori316.dumper.dumps.{Dumps, Filter, Formatter}
-import net.minecraft.core.{BlockPos, NonNullList}
+import net.minecraft.core.BlockPos
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.MinecraftServer
 import net.minecraft.world.item.{BlockItem, ItemStack}
@@ -10,7 +10,6 @@ import net.minecraft.world.level.block.Block
 import net.minecraftforge.registries.ForgeRegistries
 
 import scala.jdk.CollectionConverters._
-import scala.util.chaining._
 
 object BlocksDump extends Dumps[Block] {
   override val configName: String = "outputBlocks"
@@ -27,7 +26,7 @@ object BlocksDump extends Dumps[Block] {
     ForgeRegistries.BLOCKS.forEach(b => filters.foreach(_.addToList(b)))
     val blockList = for {
       block <- ForgeRegistries.BLOCKS.asScala
-      stack <- NonNullList.create[ItemStack]().tap(i => block.fillItemCategory(block.asItem().getItemCategory, i)).asScala
+      stack <- Seq(block.asItem.getDefaultInstance)
     } yield Data(block, stack)
     formatter.format(blockList.toSeq)
   }
