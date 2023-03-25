@@ -5,12 +5,8 @@ import java.nio.file.{Files, Path, Paths, StandardCopyOption}
 import com.kotori316.dumper.Dumper
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.MinecraftServer
-import net.minecraft.world.item.Item
-import net.minecraft.world.level.block.Block
 
-import scala.annotation.nowarn
 import scala.jdk.CollectionConverters._
-import scala.jdk.StreamConverters._
 
 trait Dumps[T] {
 
@@ -51,26 +47,4 @@ trait Dumps[T] {
   def content(filters: Seq[Filter[T]], server: MinecraftServer): Seq[String]
 
   def getFilters: Seq[Filter[T]] = Nil
-
-  def tagName(obj: Block): String = combineTagName(tagNameSeq(obj))
-
-  def tagName(obj: Item): String = combineTagName(tagNameSeq(obj))
-
-  private def combineTagName(names: Seq[ResourceLocation]): String =
-    names.mkString(", ") match {
-      case "" => ""
-      case s => " : " + s
-    }
-
-   //noinspection ScalaDeprecation,deprecation
-  @nowarn
-  def tagNameSeq(obj: Block): Seq[ResourceLocation] = {
-    obj.builtInRegistryHolder().tags().toScala(Seq).map(_.location)
-  }
-
-  //noinspection ScalaDeprecation,deprecation
-  @nowarn
-  def tagNameSeq(obj: Item): Seq[ResourceLocation] = {
-    obj.builtInRegistryHolder().tags().toScala(Seq).map(_.location)
-  }
 }

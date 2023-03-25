@@ -7,25 +7,23 @@ import com.kotori316.dumper.Dumper
 import com.kotori316.dumper.dumps.Filter
 import net.minecraft.tags.{BlockTags, ItemTags}
 import net.minecraft.world.item.ItemStack
-import net.minecraft.world.level.block.Block
-import net.minecraftforge.registries.ForgeRegistries
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
-trait SFilter extends Filter[Block] {
+trait SFilter extends Filter[BlockData] {
 
   private[this] final val short = mutable.Buffer.empty[String]
   private[this] final val unique = mutable.Buffer.empty[String]
 
   val out: Path
 
-  def accept(block: Block): Boolean
+  def accept(block: BlockData): Boolean
 
-  override final def addToList(v: Block): Boolean = {
+  override final def addToList(v: BlockData): Boolean = {
     if (accept(v)) {
-      short += v.getName.getString + BlocksDump.tagName(v)
-      unique += ForgeRegistries.BLOCKS.getKey(v).toString
+      short += v.block.getName.getString + ": " + v.tagStrings
+      unique += v.registryName.toString
       true
     } else false
   }
@@ -40,9 +38,8 @@ class OreFilter extends SFilter {
   private[this] final val oreDicPattern = Pattern.compile("(forge:ores)|(.*:ores/.*)|(.*_ores.*)")
   override val out: Path = Paths.get(Dumper.modID, "ore.txt")
 
-  override def accept(block: Block): Boolean = {
-    val oreName = BlocksDump.tagNameSeq(block)
-    oreName.exists(n => oreDicPattern.matcher(n.toString).matches())
+  override def accept(block: BlockData): Boolean = {
+    block.tags.exists(n => oreDicPattern.matcher(n.toString).matches())
   }
 }
 
@@ -52,18 +49,21 @@ class WoodFilter extends SFilter {
 
   override val out: Path = Paths.get(Dumper.modID, "wood.txt")
 
-  override def accept(block: Block): Boolean = {
+  override def accept(data: BlockData): Boolean = {
+    val block = data.block
     if (block.defaultBlockState().is(BlockTags.LOGS) || new ItemStack(block).is(ItemTags.LOGS))
       return true
     if (woodPATTERN.matcher(block.getName.getString).matches)
       return true
-    val oreName = BlocksDump.tagNameSeq(block)
-    oreName.exists(n => woodDicPATTERN.matcher(n.toString).matches)
+    data.tags.exists(n => woodDicPATTERN.matcher(n.toString).matches)
   }
 }
 
 class LeaveFilter extends SFilter {
   override val out: Path = Paths.get(Dumper.modID, "leave.txt")
 
-  override def accept(block: Block): Boolean = block.defaultBlockState().is(BlockTags.LEAVES) || new ItemStack(block).is(ItemTags.LEAVES)
+  override def accept(data: BlockData): Boolean = {
+    val block = data.block
+    block.defaultBlockState().is(BlockTags.LEAVES) || new ItemStack(block).is(ItemTags.LEAVES)
+  }
 }
