@@ -1,5 +1,6 @@
 package com.kotori316.dumper.dumps
 
+import net.minecraft.core.RegistryAccess
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.MinecraftServer
@@ -32,7 +33,7 @@ object RecipeNames extends Dumps[Recipe[_]] {
     def getId: ResourceLocation = recipe.getId
 
     def getRecipeOutput: String = {
-      val stack = recipe.getResultItem
+      val stack = recipe.getResultItem(RegistryAccess.EMPTY)
       if (stack.isEmpty) {
         "Undefined"
       } else {

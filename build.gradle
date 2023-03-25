@@ -1,3 +1,5 @@
+import net.minecraftforge.gradle.common.tasks.SignJar
+
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
@@ -21,15 +23,17 @@ apply plugin: 'org.parchmentmc.librarian.forgegradle'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
 
-version = project.modVersion
+def mcVersion = project.forgeVersion.split("-")[0]
+
+version = mcVersion + "-" + project.modVersion
 group = "com.kotori316" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "Dumper"
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 minecraft {
-    mappings channel: 'parchment', version: ((project.parchmentMapping + "-" + project.minecraftVersion) as String)
-    // mappings channel: 'official', version: project.minecraftVersion
+    mappings channel: 'parchment', version: ((project.parchmentMapping + "-" + mcVersion) as String)
+    // mappings channel: 'official', version: mcVersion
     runs {
         client {
             workingDirectory project.file('Minecraft')
@@ -108,13 +112,13 @@ jar {
     }
 }
 
-task srcJar(type: Jar) {
+tasks.register('srcJar', Jar) {
     from sourceSets.main.allSource
     archiveClassifier.set("sources")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
-task deobfJar(type: Jar) {
+tasks.register('deobfJar', Jar) {
     from sourceSets.main.output
     archiveClassifier.set("deobf")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -128,37 +132,32 @@ artifacts {
     archives srcJar, deobfJar
 }
 
-task signJar2() {
-    doLast {
-        ant.signjar(
-                jar: jar.getArchiveFile().get(),
-                alias: project.hasProperty('keyStoreAlias') ? project.getProperty('keyStoreAlias') : "",
-                keystore: project.hasProperty('keyStore') ? project.getProperty("keyStore") : "",
-                storepass: project.hasProperty('keyStorePass') ? project.getProperty('keyStorePass') : "",
-                sigalg: "SHA1withRSA",
-                digestalg: "SHA-256",
-                tsaurl: "http://timestamp.digicert.com"
-        )
-        ant.signjar(
-                jar: deobfJar.getArchiveFile().get(),
-                alias: project.hasProperty('keyStoreAlias') ? project.getProperty('keyStoreAlias') : "",
-                keystore: project.hasProperty('keyStore') ? project.getProperty("keyStore") : "",
-                storepass: project.hasProperty('keyStorePass') ? project.getProperty('keyStorePass') : "",
-                sigalg: "SHA1withRSA",
-                digestalg: "SHA-256",
-                tsaurl: "http://timestamp.digicert.com"
-        )
+tasks.register("signMainJar", SignJar) {
+    onlyIf {
+        project.hasProperty('keyStoreAlias') && project.hasProperty('keyStore') && project.hasProperty('keyStorePass')
     }
+    inputFile = jar.archiveFile.get()
+    outputFile = jar.archiveFile.get()
+    alias = project.findProperty("keyStoreAlias") ?: ""
+    storePass = project.findProperty("keyStorePass") ?: ""
+    keyStore = project.findProperty("keyStore") ?: ""
 }
-
-if (!Boolean.valueOf(System.getenv("GITHUB_ACTIONS"))) {
-    // Runs this task automatically when build is ran.
-    assemble.finalizedBy(signJar2)
+tasks.register("signDeobfJar", SignJar) {
+    onlyIf {
+        project.hasProperty('keyStoreAlias') && project.hasProperty('keyStore') && project.hasProperty('keyStorePass')
+    }
+    inputFile = deobfJar.archiveFile.get()
+    outputFile = deobfJar.archiveFile.get()
+    alias = project.findProperty("keyStoreAlias") ?: ""
+    storePass = project.findProperty("keyStorePass") ?: ""
+    keyStore = project.findProperty("keyStore") ?: ""
 }
+assemble.finalizedBy(tasks.named("signMainJar"), tasks.named("signDeobfJar"))
 
 def getChangeLog() {
+    def mcVersion = project.forgeVersion.split("-")[0]
     def string = """
-    Minecraft: ${project.minecraftVersion}
+    Minecraft: ${mcVersion}
     Forge: ${project.forgeVersion}
     Mapping: Parchment ${project.parchmentMapping}
     """ as String
@@ -178,7 +177,7 @@ githubRelease {
     overwrite.set(true)
 }
 
-task checkOutput() {
+tasks.register('checkOutput') {
     doLast {
         FilenameFilter filter = { dir, filename -> filename.contains(project.version.toString()) }
         println(project.version.toString())
