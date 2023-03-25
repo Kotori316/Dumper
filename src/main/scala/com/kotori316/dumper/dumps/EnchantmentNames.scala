@@ -12,7 +12,7 @@ import scala.jdk.CollectionConverters._
 object EnchantmentNames extends FastDumps[Enchantment] {
   override val configName: String = "OutputEnchantments"
   override val fileName: String = "enchantment"
-  final val formatter = new Formatter[EData](Seq(" ID", "-name", "-Registry Name", "MaxLevel", "Rarity", "Treasure"),
+  final val formatter = new Formatter[EData](Seq("ID", "-name", "-Registry Name", "MaxLevel", "Rarity", "Treasure"),
     Seq(_.id, _.translatedName, _.name, _.e.getMaxLevel, _.e.getRarity, _.e.isTreasureOnly)
   )
 

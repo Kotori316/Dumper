@@ -5,13 +5,19 @@ class Formatter[A](rows: Seq[String], converters: Seq[A => Any]) {
   require(rows.size == converters.size, s"rows $rows doesn't match converters $converters.")
 
   def format(as: scala.collection.Seq[A]): Seq[String] = {
-    val converted: Seq[Seq[String]] = as.map(a => converters.map(_.apply(a).toString)).toSeq
-    val lengthMaxes: Seq[Int] = (rows +: converted).map(_.map(_.length)).foldLeft(Seq.fill(rows.size)(0)) {
+    val convertedContent: Seq[Seq[String]] = as.map(a => converters.map(_.apply(a).toString)).toSeq
+    val lengthMaxes: Seq[Int] = (rows +: convertedContent).map(_.map(_.length)).foldLeft(Seq.fill(rows.size)(0)) {
       case (s1, s2) => (s1 zip s2).map { case (i, i1) => i max i1 }
     }
     val secondRow = makeSecondRow(lengthMaxes)
     val formatString = (lengthMaxes zip rows).map { case (i, str) => s"%${getMinus(str)}${i}s" }.mkString("| ", " | ", " |")
-    (removeMinus(rows) +: secondRow +: converted).map(ss => formatString.format(ss: _*))
+
+    val headers: Seq[String] = Seq(
+      formatString.format(removeMinus(rows): _*),
+      secondRow.mkString("|", "|", "|")
+    )
+
+    (headers ++ convertedContent.map(ss => formatString.format(ss: _*)))
       .map(s => ("0" + s).trim.substring(1))
   }
 
@@ -26,7 +32,8 @@ class Formatter[A](rows: Seq[String], converters: Seq[A => Any]) {
       val isLeft = row.startsWith("-")
       val prefix = if (isLeft) ":" else ""
       val postfix = if (isLeft) "" else ":"
-      prefix + "-" * (max - 1) + postfix
+      // Minus 1 means the colon. Plus 2 means the spaces inserted to separate entries.
+      prefix + "-" * (max - 1 + 2) + postfix
     }
   }
 }
